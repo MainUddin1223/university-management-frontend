@@ -12,5 +12,5 @@ export type IDepartment = {
     title: string,
     createdAt: string,
     updatedAt: string,
-    _id: number
+    _id: string
 }

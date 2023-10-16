@@ -11,6 +11,8 @@ import { useUserLoginMutation } from '@/redux/api/authApi';
 import { getUserInfo, storeUserInfo } from '@/services/auth.service';
 import { useRouter } from 'next/navigation';
 import { FormValues } from "@/types";
+import { yupResolver } from '@hookform/resolvers/yup';
+import { loginSchema } from '@/schemas/authSchema';
 
 const Login = () => {
 
@@ -43,7 +45,7 @@ const Login = () => {
           style={{ margin: "15px 0" }}
         >First login your account</h1>
         <div>
-          <Form submitHandler={onsubmit}>
+          <Form submitHandler={onsubmit} resolver={yupResolver(loginSchema)}>
             <div
             style={{ margin: "15px 0" }}
             >

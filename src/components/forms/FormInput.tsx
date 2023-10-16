@@ -29,7 +29,7 @@ const FormInput = ({
    
     const { control, formState: { errors } } = useFormContext();
 
-    const errorMessage = getErrorMessageByPropartyName(errors,name)
+    const errorMessage = getErrorMessageByPropartyName(errors, name);
 
   return (
       <>

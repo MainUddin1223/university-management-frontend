@@ -7,19 +7,64 @@ import FormTextArea from "@/components/forms/FormTextArea";
 import FromSelectField from "@/components/forms/FromSelectField";
 import UploadImage from "@/components/ui/UploadImage";
 import { bloodGroupOptions, departmentOptions, genderOptions } from "@/constants/selectOptions";
+import { useAddAdminMutation } from "@/redux/api/adminApi";
+import { useDepartmentsQuery } from "@/redux/api/departmentApi";
 import { adminSchema } from "@/schemas/admin";
+import { IDepartment } from "@/types";
+import { contentQuotesLinter } from "@ant-design/cssinjs/lib/linters";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Button, Col, Row } from "antd"
+import { Button, Col, Row, message } from "antd"
 
 const CreateAdmin = () => {
-
-      const onSubmit = async (data:any) => {
-    try {
-      console.log(data)
-    } catch (error) {
-        console.log(error)
-    }
+  const { data, isLoading } = useDepartmentsQuery({ limit: 100, page: 1 });
+  const [addAdmin] = useAddAdminMutation()
+  if (isLoading) {
+     return <p>Loading.....</p>
   }
+
+  // const onSubmit = async (values: any) => {
+  //   const obj = { ...values };
+  //   const file = obj['file'];
+  //   delete obj['file']
+  //   const data = JSON.stringify(obj);
+  //   const formData = new FormData();
+  //   formData.append("file", file as Blob);
+  //   formData.append('data',data)
+  //   message.loading("Creating ...")
+  //   try {
+  //         console.log(formData)
+  //         await addAdmin(formData);
+  //         message.success("Admin created successfully")
+  //     console.log(data)
+  //   } catch (error) {
+  //       console.log(error)
+  //   }
+  // }
+    const onSubmit = async (values: any) => {
+    const obj = { ...values };
+    const file = obj["file"];
+    delete obj["file"];
+    const data = JSON.stringify(obj);
+    const formData = new FormData();
+    formData.append("file", file as Blob);
+    formData.append("data", data);
+    message.loading("Creating...");
+    try {
+      await addAdmin(formData);
+      message.success("Admin created successfully!");
+    } catch (err: any) {
+      console.error(err.message);
+    }
+  };
+
+    //@ts-ignore
+  const departments: IDepartment[] = data?.departments;
+  const departmentsOptions = departments.map((dep: IDepartment) => {
+    return {
+      label: dep.title,
+      value:dep._id
+    }
+  })
   return (
       <div>
           <h1>Create Admin</h1>
@@ -85,7 +130,7 @@ const CreateAdmin = () => {
                         <Col className="gutter-row" span={8} style={{marginBottom:"10px"}}>
                             <FromSelectField
                                   name="admin.managementDepartment"
-                                  options={departmentOptions}
+                                  options={departmentsOptions}
                                   size="large"
                                   label="Department"
                                   placeholder="Select"
@@ -93,7 +138,7 @@ const CreateAdmin = () => {
                             
                           </Col>
                           <Col className="gutter-row" span={8} style={{marginBottom:"10px"}}>
-                              <UploadImage/>
+                              <UploadImage name="file"/>
                           </Col>
                     </Row>
                   </div>
